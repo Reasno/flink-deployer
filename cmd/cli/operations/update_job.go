@@ -23,6 +23,7 @@ type UpdateJob struct {
 	ProgramArgs           []string
 	SavepointDir          string
 	AllowNonRestoredState bool
+	Deploy                bool
 }
 
 func (o RealOperator) filterRunningJobsByName(jobs []flink.Job, jobNameBase string) (ret []flink.Job) {
@@ -103,7 +104,12 @@ func (o RealOperator) Update(u UpdateJob) error {
 	}
 	switch len(runningJobs) {
 	case 0:
-		return fmt.Errorf("no instance running for job name base \"%v\". Aborting update", u.JobNameBase)
+		if u.Deploy {
+			log.Printf("no instance running for job name base \"%v\". Creating new", u.JobNameBase)
+		} else {
+			return fmt.Errorf("no instance running for job name base \"%v\". Aborting update", u.JobNameBase)
+		}
+
 	case 1:
 		log.Printf("found exactly 1 running job with base name: \"%v\"", u.JobNameBase)
 		job := runningJobs[0]

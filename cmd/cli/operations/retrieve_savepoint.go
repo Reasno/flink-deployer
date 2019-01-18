@@ -55,19 +55,23 @@ func (o RealOperator) retrieveLatestSavepointS3(dir *url.URL) (string, error) {
 		input.Prefix = aws.String(strings.TrimLeft(dir.Path, "/"))
 	}
 
-	var newestFile url.URL
+	var newestFile *url.URL
 	var newestTime time.Time
 	err = client.ListObjectsV2Pages(input, func(output *s3.ListObjectsV2Output, lastPage bool) bool {
 		for _, object := range output.Contents {
 			if strings.HasSuffix(*object.Key, "_metadata") && object.LastModified.After(newestTime) {
 				newestTime = *object.LastModified
-				newestFile = url.URL{Scheme: dir.Scheme, Host: dir.Host, Path: *object.Key}
+				newestFile = &url.URL{Scheme: dir.Scheme, Host: dir.Host, Path: *object.Key}
 			}
 		}
 		return true
 	})
 	if err != nil {
 		return "", errors.New("listing S3 objects: " + err.Error())
+	}
+
+	if newestFile == nil {
+		return "", nil
 	}
 
 	return newestFile.String(), nil

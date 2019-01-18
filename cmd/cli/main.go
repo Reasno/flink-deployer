@@ -156,6 +156,7 @@ func UpdateAction(c *cli.Context) error {
 	}
 
 	update.AllowNonRestoredState = c.Bool("allow-non-restored-state")
+	update.Deploy = c.Bool("deploy")
 
 	err := operator.Update(update)
 
@@ -328,6 +329,10 @@ func main() {
 				cli.BoolFlag{
 					Name:  "allow-non-restored-state, anrs",
 					Usage: "Allow the job to run if the state cannot be restored",
+				},
+				cli.BoolFlag{
+					Name:  "deploy, d",
+					Usage: "Deploy the job if a job with the given base name doesn't already exist",
 				},
 			},
 			Action: UpdateAction,
