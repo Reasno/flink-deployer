@@ -157,6 +157,7 @@ func UpdateAction(c *cli.Context) error {
 
 	update.AllowNonRestoredState = c.Bool("allow-non-restored-state")
 	update.Deploy = c.Bool("deploy")
+	update.MaxSavepointDuration = c.Int("max-savepoint-duration")
 
 	err := operator.Update(update)
 
@@ -333,6 +334,11 @@ func main() {
 				cli.BoolFlag{
 					Name:  "deploy, d",
 					Usage: "Deploy the job if a job with the given base name doesn't already exist",
+				},
+				cli.IntFlag{
+					Name:  "max-savepoint-duration, msd",
+					Usage: "The maximum duration in seconds to wait for savepoint creation",
+					Value: 60,
 				},
 			},
 			Action: UpdateAction,

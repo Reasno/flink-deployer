@@ -24,6 +24,7 @@ type UpdateJob struct {
 	SavepointDir          string
 	AllowNonRestoredState bool
 	Deploy                bool
+	MaxSavepointDuration  int
 }
 
 func (o RealOperator) filterRunningJobsByName(jobs []flink.Job, jobNameBase string) (ret []flink.Job) {
@@ -120,7 +121,7 @@ func (o RealOperator) Update(u UpdateJob) error {
 			return fmt.Errorf("failed to create savepoint for job %v due to error: %v", job.ID, err)
 		}
 
-		err = o.monitorSavepointCreation(job.ID, savepointResponse.RequestID, 60)
+		err = o.monitorSavepointCreation(job.ID, savepointResponse.RequestID, u.MaxSavepointDuration)
 		if err != nil {
 			return err
 		}
