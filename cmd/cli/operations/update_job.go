@@ -45,6 +45,11 @@ func (o RealOperator) monitorSavepointCreation(jobID string, requestID string, m
 
 		switch res.Status.Id {
 		case "COMPLETED":
+			if res.Operation != nil && res.Operation.FailureCause != nil {
+				err = fmt.Errorf("savepoint completed with failure class %s: %s", res.Operation.FailureCause.Class, res.Operation.FailureCause.StackTrace)
+				log.Println(err)
+				return err
+			}
 			return nil
 		case "IN_PROGRESS":
 			err = fmt.Errorf("savepoint creation for job \"%v\" is still pending", jobID)

@@ -65,10 +65,27 @@ type SavepointCreationStatus struct {
 	Id string `json:"id"`
 }
 
+// SavepointOperation represents the savepoint operation used by the API
+// The Flink documentation describes this field as type "any":
+//	 https://ci.apache.org/projects/flink/flink-docs-stable/monitoring/rest_api.html#jobs-jobid-savepoints-triggerid
+// This struct definition is based on observed error responses returned by Flink
+// version 1.8
+type SavepointOperation struct {
+	FailureCause *SavepointFailureCause `json:"failure-cause"`
+}
+
+// SavepointFailureCause represents the savepoint failure cause used by the API
+type SavepointFailureCause struct {
+	Class               string `json:"class"`
+	StackTrace          string `json:"stack-trace"`
+	SerializedThrowable string `json:"serialized-throwable"`
+}
+
 // MonitorSavepointCreationResponse represents the response body
 // used by the savepoint monitoring API
 type MonitorSavepointCreationResponse struct {
-	Status SavepointCreationStatus `json:"status"`
+	Status    SavepointCreationStatus `json:"status"`
+	Operation *SavepointOperation     `json:"operation"`
 }
 
 // MonitorSavepointCreation allows for monitoring the status of a savepoint creation
