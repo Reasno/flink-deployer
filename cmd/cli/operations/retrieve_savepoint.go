@@ -3,7 +3,6 @@ package operations
 import (
 	"errors"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -31,14 +30,12 @@ func (o RealOperator) retrieveLatestSavepoint(dir string) (string, error) {
 }
 
 func (o RealOperator) retrieveLatestSavepointS3(dir *url.URL) (string, error) {
-	region := os.Getenv("AWS_REGION")
-	if region == "" {
-		return "", errors.New("AWS_REGION env var must be specified for S3 savepoint directories")
-	}
-
 	config := &aws.Config{
-		Region:      aws.String(os.Getenv("AWS_REGION")),
-		Credentials: credentials.NewEnvCredentials(),
+		Endpoint:         aws.String("http://minio.minio:9000"),
+		Region:           aws.String("cn-foshan-1"),
+		Credentials:      credentials.NewEnvCredentials(),
+		DisableSSL:       aws.Bool(true),
+		S3ForcePathStyle: aws.Bool(true),
 	}
 
 	sess, err := session.NewSession()
